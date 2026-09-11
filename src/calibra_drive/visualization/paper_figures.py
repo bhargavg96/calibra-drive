@@ -682,17 +682,17 @@ class PaperFigureGenerator:
         print(f"   Using scenario {median_idx} (density={densities[median_idx]:.3f})")
 
         # Figure 1: BEV Uncertainty Scene
-        self.plot_bev_uncertainty_scene(prob, unc, gt, model_name=model_name)
+        self.plot_bev_uncertainty_scene(prob, unc, gt, title=f"{model_name}: Predicted Occupancy with Uncertainty")
         saved["bev_uncertainty_scene"] = self.save_dir / f"bev_uncertainty_scene.{self.fmt}"
         print("   ✅ BEV uncertainty scene")
 
         # Figure 2: Rollout Montage
-        self.plot_rollout_montage(samples, gt, model_name=model_name)
+        self.plot_rollout_montage(samples, gt, title=f"{model_name}: Diverse Stochastic Predictions")
         saved["rollout_montage"] = self.save_dir / f"rollout_montage.{self.fmt}"
         print("   ✅ Stochastic rollout montage")
 
         # Figure 3: Confidence vs Reality
-        self.plot_confidence_vs_reality(prob, gt, model_name=model_name)
+        self.plot_confidence_vs_reality(prob, gt, title=f"{model_name}: Confidence vs. Reality")
         saved["confidence_vs_reality"] = self.save_dir / f"confidence_vs_reality.{self.fmt}"
         print("   ✅ Confidence vs. reality")
 

@@ -1,0 +1,19 @@
+experiment:
+  name: recalibration
+  seed: 42
+  output_dir: outputs/${experiment.name}
+
+recalibration:
+  cal_split_ratio: 0.3  # fraction of val set used for calibration fitting
+  methods:
+    temperature_scaling:
+      enabled: true
+      optimizer: lbfgs
+      max_iter: 100
+      lr: 0.01
+    conformal_prediction:
+      enabled: true
+      alpha_levels: [0.05, 0.10, 0.20]  # 95%, 90%, 80% coverage
+    histogram_binning:
+      enabled: true
+      num_bins: 15

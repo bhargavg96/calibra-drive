@@ -1,0 +1,12 @@
+model:
+  name: vista
+  checkpoint: OpenDriveLab/Vista  # HuggingFace model ID
+  device: cuda
+  n_samples: 20
+  sampling:
+    num_inference_steps: 25
+    guidance_scale: 2.5
+  prediction:
+    horizon_frames: 25
+    fps: 10
+    resolution: [576, 1024]

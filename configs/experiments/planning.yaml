@@ -1,0 +1,16 @@
+experiment:
+  name: planning_eval
+  seed: 42
+  output_dir: outputs/${experiment.name}
+
+planning:
+  method: mpc
+  horizon: 3.0  # seconds
+  dt: 0.5  # timestep
+  num_candidate_actions: 100
+  risk_aversion_lambda: [0.0, 0.5, 1.0, 2.0, 5.0]
+  cost_weights:
+    collision: 100.0
+    progress: -1.0
+    comfort: 0.5
+    offroad: 50.0

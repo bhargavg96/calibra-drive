@@ -1,0 +1,13 @@
+model:
+  name: occworld
+  checkpoint: null  # path to OccWorld checkpoint
+  repo_path: null  # path to cloned OccWorld repo
+  device: cuda
+  n_samples: 20
+  sampling:
+    strategy: temperature  # temperature, top_k, top_p
+    temperature: 1.0
+    top_k: 50
+  prediction:
+    horizon_steps: 6  # number of future steps to predict
+    horizon_seconds: 3.0

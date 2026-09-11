@@ -1,0 +1,11 @@
+dataset:
+  name: nuscenes
+  version: v1.0-mini  # change to v1.0-trainval for full eval
+  dataroot: ${oc.env:NUSCENES_ROOT,./data/nuscenes}
+  split: val
+  max_sweeps: 10
+  image_size: [900, 1600]
+  occupancy:
+    grid_size: [200, 200, 16]  # X, Y, Z voxels
+    voxel_size: [0.5, 0.5, 0.5]  # meters
+    pc_range: [-50, -50, -5, 50, 50, 3]  # xmin,ymin,zmin,xmax,ymax,zmax

@@ -1,0 +1,29 @@
+experiment:
+  name: calibration_benchmark
+  seed: 42
+  output_dir: outputs/${experiment.name}
+
+scenarios:
+  num_easy: 500
+  num_medium: 500
+  num_hard: 500
+  total: 1500
+
+calibration:
+  num_bins: 15
+  bin_strategy: equal_width  # equal_width or equal_mass
+  metrics:
+    - ece
+    - mce
+    - brier
+    - auroc
+    - reliability_diagram
+
+spatial_analysis:
+  distance_bins: [0, 10, 30, 50, 100]  # meters from ego
+  categories:
+    - dynamic  # vehicles, pedestrians, cyclists
+    - static   # road, buildings, vegetation
+
+temporal_analysis:
+  horizons: [0.5, 1.0, 2.0, 3.0, 5.0]  # seconds

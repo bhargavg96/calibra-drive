@@ -35,11 +35,20 @@ To understand the practical failure modes of driving world models beyond aggrega
 
 \textbf{Case 4: Long-Horizon Hallucination (Autoregressive Drift):} At horizons $t \ge 2.5$s, compounding discrete token errors cause phantom obstacles to materialize on clear road surfaces while genuine obstacles fade, explaining the dramatic temporal calibration decay observed in Section~\ref{sec:experiments}.
 
+\textbf{Front-Camera Behavioral Rollouts:} In addition to top-down grid representations, Figure~\ref{fig:camera_behavior} visualizes the driver's front-camera perspective across sequential rollouts ($t=0.5\text{s} \to 3.0\text{s}$). Projecting predictive uncertainty directly onto the physical road surface and dynamic actors reveals that world models often exhibit severe epistemic blind spots during dynamic cut-ins, failing to elevate predictive variance until after physical buffer violations occur.
+
 \begin{figure*}[t]
 \centering
 % \includegraphics[width=\linewidth]{figures/fig9_driving_anecdotes}
 \caption{Qualitative real-world driving anecdotes mined by CalibraDrive. We highlight four archetypal corner cases: (Case 1) Blind-Zone Pedestrian Emergence, where models overconfidently predict free space in occlusions; (Case 2) Unprotected Left Turn with oncoming traffic, showing mode collapse; (Case 3) High-Speed Lateral Cut-In, revealing dynamic calibration lag; and (Case 4) Long-Horizon Hallucination at $t=3.0$s. Columns depict ground truth context, model predicted confidence, predictive uncertainty, and safety-critical failure regions.}
 \label{fig:anecdotes}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+% \includegraphics[width=\linewidth]{figures/fig10_camera_behavior_filmstrip}
+\caption{Front-camera driver perspective and behavioral dynamics across prediction horizons ($t=0.5\text{s}$ to $3.0\text{s}$). Row 1 shows the physical road environment and dynamic actor movements (cut-in vehicle and roadside pedestrian). Row 2 projects the model's predictive uncertainty heatmap directly onto the camera view. Row 3 depicts synchronized BEV occupancy and ego planned path.}
+\label{fig:camera_behavior}
 \end{figure*}
 
 \subsection{Recalibration (E5)}

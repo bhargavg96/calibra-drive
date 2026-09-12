@@ -20,6 +20,8 @@
 | **Fig. 7** | `paper/figures/fig7_recalibration.pdf` | Step 5/8 | Before/after recalibration scene + reliability |
 | **Fig. 8** | `paper/figures/fig8_planning_tradeoff.pdf` | Step 6 | Planning safety vs. progress trade-off curves |
 | **Fig. 9** | `paper/figures/fig9_driving_anecdotes.pdf` | Step 8.5 | Qualitative case studies: 4 real-world driving anecdotes & failure modes |
+| **Fig. 10** | `paper/figures/fig10_camera_behavior_filmstrip.pdf` | Step 8.6 | Front-camera road picture sequence showing dynamic actor behavior & projected uncertainty |
+| **Fig. 11** | `paper/figures/fig11_road_camera_anecdotes.pdf` | Step 8.6 | Front-camera driver perspective driving anecdotes & calibration failure overlays |
 
 ### Table Mapping
 

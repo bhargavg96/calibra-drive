@@ -9,3 +9,7 @@ data/
 wandb/
 *.egg-info/
 .pytest_cache/
+paper/figures/
+paper/tables/
+paper/manifest.json
+.DS_Store

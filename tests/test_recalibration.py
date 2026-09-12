@@ -18,6 +18,7 @@ def test_temperature_scaling_softens():
     assert preds[0] < 1 / (1 + np.exp(-2.0))
 
 def test_conformal_coverage():
+    np.random.seed(42)
     cp = ConformalPredictor(alpha=0.1)
     preds = np.linspace(0, 1, 100)
     gts = preds + np.random.normal(0, 0.05, 100)

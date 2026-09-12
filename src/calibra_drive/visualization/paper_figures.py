@@ -643,6 +643,115 @@ class PaperFigureGenerator:
     #  Generate all paper figures from experiment data
     # ──────────────────────────────────────────────────────────────────────
 
+
+    # ──────────────────────────────────────────────────────────────────────
+    #  Figure 7: Qualitative Real-World Driving Anecdotes Panel
+    # ──────────────────────────────────────────────────────────────────────
+
+    def plot_anecdotes_panel(
+        self,
+        anecdotes: list,
+        predictions: list[np.ndarray],
+        ground_truths: list[np.ndarray],
+        model_name: str = "OccWorld",
+        save_name: Optional[str] = "fig9_driving_anecdotes",
+    ) -> plt.Figure:
+        """Plot multi-scenario driving anecdotes panel contrasting real-world corner cases.
+
+        Creates a 4-row x 4-column figure:
+        Rows: 4 distinct real-world driving anecdotes (VRU Blind Zone, Unprotected Turn, Cut-In, Temporal Drift)
+        Cols: (1) Ground Truth Scenario & Scene Info
+              (2) World Model Confidence Heatmap P(occ)
+              (3) Predictive Uncertainty (Std Dev across samples)
+              (4) Dangerous Overconfidence Failure Regions
+        """
+        num_cases = min(4, len(anecdotes))
+        fig, axes = plt.subplots(num_cases, 4, figsize=(16, 3.8 * num_cases))
+        if num_cases == 1:
+            axes = np.expand_dims(axes, 0)
+
+        fig.suptitle(
+            f"Qualitative Case Studies: Real-World Driving Failure Modes ({model_name})",
+            fontsize=15, fontweight="bold", y=0.995,
+        )
+
+        col_titles = [
+            "(a) Ground Truth Context",
+            "(b) Model Confidence $P(\\mathrm{occ})$",
+            "(c) Predictive Uncertainty $\\sigma$",
+            "(d) Safety-Critical Miscalibration",
+        ]
+
+        for c, title in enumerate(col_titles):
+            axes[0, c].set_title(title, fontsize=12, fontweight="bold", pad=8)
+
+        for r, anecdote in enumerate(anecdotes[:num_cases]):
+            idx = anecdote.scenario_idx
+            samples = predictions[idx]        # (N, T, H, W)
+            gt = ground_truths[idx]           # (T, H, W)
+            t = min(2, gt.shape[0] - 1)
+
+            prob = samples[:, t].mean(axis=0)
+            unc = samples[:, t].std(axis=0)
+            gt_t = gt[t]
+            H, W = gt_t.shape
+            center = (W / 2, H / 2)
+
+            # Col 0: Ground Truth Context
+            ax0 = axes[r, 0]
+            ax0.imshow(gt_t, cmap=OCC_CMAP, vmin=0, vmax=1, origin="lower")
+            _draw_road_markings(ax0, (H, W))
+            _draw_ego_vehicle(ax0, center, size=5.0)
+            ax0.set_ylabel(
+                f"{anecdote.case_title}\n[{anecdote.archetype.upper()}]",
+                fontsize=9.5, fontweight="bold", labelpad=8,
+            )
+            ax0.set_xticks([])
+            ax0.set_yticks([])
+
+            # Col 1: Model Confidence P(occ)
+            ax1 = axes[r, 1]
+            im1 = ax1.imshow(prob, cmap="magma", vmin=0, vmax=1, origin="lower")
+            _draw_road_markings(ax1, (H, W))
+            _draw_ego_vehicle(ax1, center, size=5.0)
+            ax1.set_xticks([])
+            ax1.set_yticks([])
+
+            # Col 2: Predictive Uncertainty
+            ax2 = axes[r, 2]
+            im2 = ax2.imshow(unc, cmap=UNCERTAINTY_CMAP, vmin=0, vmax=max(0.35, unc.max()), origin="lower")
+            _draw_road_markings(ax2, (H, W))
+            _draw_ego_vehicle(ax2, center, size=5.0)
+            ax2.set_xticks([])
+            ax2.set_yticks([])
+
+            # Col 3: Safety-Critical Miscalibration Overlay
+            ax3 = axes[r, 3]
+            cal_err = np.abs(prob - gt_t)
+            ax3.imshow(gt_t, cmap=OCC_CMAP, alpha=0.35, origin="lower")
+            im3 = ax3.imshow(cal_err, cmap=CALERR_CMAP, vmin=0, vmax=1, alpha=0.75, origin="lower")
+            _draw_road_markings(ax3, (H, W))
+            _draw_ego_vehicle(ax3, center, size=5.0)
+
+            # Highlight dangerous false negatives (p < 0.20 but GT == 1)
+            danger_fn = (prob < 0.20) & (gt_t == 1)
+            if danger_fn.any():
+                ax3.contour(danger_fn, levels=[0.5], colors=["#FF1744"], linewidths=1.5, origin="lower")
+            # Highlight dangerous false positives (p > 0.80 but GT == 0)
+            danger_fp = (prob > 0.80) & (gt_t == 0)
+            if danger_fp.any():
+                ax3.contour(danger_fp, levels=[0.5], colors=["#FFEA00"], linewidths=1.2, linestyles="--", origin="lower")
+
+            ax3.set_xticks([])
+            ax3.set_yticks([])
+
+        plt.tight_layout(rect=[0, 0.02, 1, 0.98])
+
+        if save_name:
+            self._save(fig, save_name)
+
+        return fig
+
     def generate_all(
         self,
         predictions: list[np.ndarray],
@@ -715,6 +824,19 @@ class PaperFigureGenerator:
                          model_name=model_name)
         saved["teaser"] = self.save_dir / f"teaser.{self.fmt}"
         print("   ✅ Paper teaser (composite)")
+
+        # Figure 7: Driving Anecdotes Panel
+        try:
+            from calibra_drive.metrics.anecdote_miner import AnecdoteMiner
+            miner = AnecdoteMiner()
+            anecdotes = miner.mine_anecdotes(predictions, ground_truths, model_name=model_name)
+            self.plot_anecdotes_panel(anecdotes, predictions, ground_truths, model_name=model_name, save_name="fig9_driving_anecdotes")
+            saved["driving_anecdotes"] = self.save_dir / f"fig9_driving_anecdotes.{self.fmt}"
+            miner.export_report(anecdotes, save_path=self.save_dir / "anecdotes_report.txt")
+            print("   ✅ Real-world driving anecdotes panel & case study report")
+        except Exception as e:
+            print(f"   ⚠️ Could not generate anecdotes panel: {e}")
+
 
         print(f"\n📁 All figures saved to: {self.save_dir}")
         return saved

@@ -19,6 +19,7 @@
 | **Fig. 6** | `paper/figures/fig6_temporal_strip.pdf` | Step 8 | Temporal evolution of predictions + uncertainty |
 | **Fig. 7** | `paper/figures/fig7_recalibration.pdf` | Step 5/8 | Before/after recalibration scene + reliability |
 | **Fig. 8** | `paper/figures/fig8_planning_tradeoff.pdf` | Step 6 | Planning safety vs. progress trade-off curves |
+| **Fig. 9** | `paper/figures/fig9_driving_anecdotes.pdf` | Step 8.5 | Qualitative case studies: 4 real-world driving anecdotes & failure modes |
 
 ### Table Mapping
 

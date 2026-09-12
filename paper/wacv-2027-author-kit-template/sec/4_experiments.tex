@@ -23,6 +23,25 @@ Our baseline evaluation reveals that both occupancy and video world models are s
 
 \textbf{Scenario Difficulty and Dynamics:} Hard scenarios exhibit significantly worse calibration than easy scenarios. Furthermore, uncertainty is particularly poorly calibrated for dynamic objects compared to static backgrounds, suggesting models struggle to properly quantify uncertainty in complex, highly dynamic interactions.
 
+\subsection{Qualitative Driving Anecdotes \& Failure Modes}
+\label{sec:anecdotes}
+To understand the practical failure modes of driving world models beyond aggregate metrics, we mine and analyze specific real-world driving anecdotes from nuScenes (Figure~\ref{fig:anecdotes}):
+
+\textbf{Case 1: Blind-Zone Pedestrian Emergence (False-Negative Hazard):} When a pedestrian steps into a crosswalk from behind a parked high-profile truck, the world model overconfidently predicts free space ($p < 0.15$) in the unobserved blind zone instead of expressing high epistemic uncertainty. For downstream planners, this false certainty suppresses braking, directly inducing safety-critical collision risk.
+
+\textbf{Case 2: Unprotected Left Turn (Mode Collapse):} Navigating an intersection with oncoming traffic presents a bifurcating decision boundary. Rather than capturing a bimodal distribution across stochastic rollouts, the model exhibits mode collapse, predicting with unjustified certainty that oncoming agents will yield.
+
+\textbf{Case 3: High-Speed Lateral Cut-In (Dynamic Lag):} When an adjacent vehicle abruptly swerves into the ego buffer, the model's confidence exhibits a severe temporal lag, underestimating lateral displacement during transition timesteps ($t \approx 1.5$s).
+
+\textbf{Case 4: Long-Horizon Hallucination (Autoregressive Drift):} At horizons $t \ge 2.5$s, compounding discrete token errors cause phantom obstacles to materialize on clear road surfaces while genuine obstacles fade, explaining the dramatic temporal calibration decay observed in Section~\ref{sec:experiments}.
+
+\begin{figure*}[t]
+\centering
+% \includegraphics[width=\linewidth]{figures/fig9_driving_anecdotes}
+\caption{Qualitative real-world driving anecdotes mined by CalibraDrive. We highlight four archetypal corner cases: (Case 1) Blind-Zone Pedestrian Emergence, where models overconfidently predict free space in occlusions; (Case 2) Unprotected Left Turn with oncoming traffic, showing mode collapse; (Case 3) High-Speed Lateral Cut-In, revealing dynamic calibration lag; and (Case 4) Long-Horizon Hallucination at $t=3.0$s. Columns depict ground truth context, model predicted confidence, predictive uncertainty, and safety-critical failure regions.}
+\label{fig:anecdotes}
+\end{figure*}
+
 \subsection{Recalibration (E5)}
 We apply post-hoc recalibration methods and report the results in Table~\ref{tab:recalibration}. Temperature scaling proves highly effective, reducing the ECE by over \TODO{50\%} for both models. Conformal prediction successfully provides the desired marginal coverage guarantees (Table~\ref{tab:conformal}), yielding reliable uncertainty bounds for high-stakes predictions.
 

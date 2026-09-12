@@ -1,0 +1,48 @@
+\section{Methodology}
+\label{sec:method}
+
+\subsection{Problem Formulation}
+We define a driving world model $W$ as a probabilistic model that takes historical context $c$ (e.g., past sensor data, maps) and future ego actions $a$ to produce a distribution over future states. Let $Y \in \mathcal{Y}$ be the true future state. The model produces a predictive distribution $P_\theta(Y | c, a)$, from which we can extract a confidence score $\hat{p}$ for a specific prediction $\hat{Y}$. 
+
+A model is perfectly calibrated if the confidence $\hat{p}$ matches the empirical probability of the prediction being correct. Formally:
+\begin{equation}
+\mathbb{P}(Y = \hat{Y} \mid \hat{p} = p) = p, \quad \forall p \in [0, 1].
+\end{equation}
+For 3D occupancy models, we evaluate binary calibration per voxel, where $\hat{p}$ is the predicted probability of the voxel being occupied. For video generation, we assess the predictive variance and probability of semantic classes per pixel.
+
+\subsection{Calibration Metrics}
+To quantify calibration, we employ standard metrics adapted for the spatial-temporal nature of driving predictions.
+\begin{itemize}
+    \item \textbf{Expected Calibration Error (ECE):} We partition the confidence scores into $B$ bins. The ECE is the weighted average of the absolute difference between accuracy and confidence across bins:
+    \begin{equation}
+    \ece = \sum_{b=1}^{B} \frac{|B_b|}{N} |\text{acc}(B_b) - \text{conf}(B_b)|,
+    \end{equation}
+    where $N$ is the total number of predictions, and $B_b$ represents the set of predictions falling into bin $b$.
+    \item \textbf{Maximum Calibration Error (MCE):} The maximum discrepancy across all bins: $\max_b |\text{acc}(B_b) - \text{conf}(B_b)|$.
+    \item \textbf{Brier Score:} A strictly proper scoring rule measuring the mean squared error of probability predictions: $\frac{1}{N}\sum_{i=1}^N (p_i - y_i)^2$.
+    \item \textbf{AUROC \& Reliability Diagrams:} We use AUROC to evaluate discriminative ability, independent of calibration. Reliability diagrams visually plot accuracy versus confidence.
+\end{itemize}
+
+\subsection{Spatial-Temporal Analysis}
+Driving predictions are inherently spatial and temporal. A prediction error directly in front of the ego vehicle is significantly more critical than one 100 meters away. Thus, CalibraDrive stratifies evaluation across several axes:
+\begin{itemize}
+    \item \textbf{Spatial Distance:} We evaluate calibration in discrete radial distance bins from the ego vehicle: $[0-10m, 10-30m, 30-50m, 50-100m]$.
+    \item \textbf{Temporal Horizon:} We analyze calibration across prediction horizons from $0.5$s up to $3.0$s into the future.
+    \item \textbf{Scenario Difficulty:} We classify scenarios as easy, medium, or hard based on agent density, road curvature, and average time-to-collision (TTC).
+    \item \textbf{Dynamic vs. Static:} We separately evaluate calibration for static background elements versus dynamic traffic participants.
+\end{itemize}
+
+\subsection{Post-Hoc Recalibration}
+We evaluate three post-hoc recalibration techniques to improve the uncertainty estimates of world models without requiring retraining:
+\begin{enumerate}
+    \item \textbf{Temperature Scaling \cite{guo2017calibration}:} A single scalar parameter $T$ is learned on a validation set by minimizing the Negative Log-Likelihood (NLL). The calibrated probability is given by $p' = \sigma(z/T)$, where $z$ is the logit and $\sigma$ is the sigmoid or softmax function.
+    \item \textbf{Conformal Prediction \cite{romano2019conformal}:} Provides a distribution-free theoretical guarantee that the true outcome falls within a predicted set with a user-specified probability $1-\alpha$.
+    \item \textbf{Histogram Binning:} A non-parametric baseline that aligns probabilities within predefined bins to match their empirical frequencies.
+\end{enumerate}
+
+\subsection{Downstream Planning Evaluation}
+To understand the practical impact of calibration, we integrate the world model into a Model Predictive Control (MPC) planning framework. The planner minimizes a cost function $J(a)$:
+\begin{equation}
+J(a) = \mathbb{E}[C(a)] + \lambda \cdot U(a),
+\end{equation}
+where $C(a)$ represents standard planning costs (e.g., collisions, progress, comfort), and $U(a)$ is an uncertainty penalty derived from the world model's predictive variance or entropy. We vary the risk-aversion parameter $\lambda$ from 0 (uncertainty-agnostic baseline) to 5 (highly risk-averse). We evaluate the resulting planner's collision rate, route progress, and comfort metrics.

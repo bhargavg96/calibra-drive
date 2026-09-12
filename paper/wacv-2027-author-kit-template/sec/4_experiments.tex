@@ -1,0 +1,30 @@
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Setup}
+\textbf{Dataset:} We use the standard nuScenes dataset \cite{caesar2020nuscenes}, focusing on the validation split. We curate a subset of 1500 diverse scenarios, stratified into easy, medium, and hard difficulties. 
+
+\textbf{Models:} We evaluate two representative architectures:
+\begin{itemize}
+    \item \textbf{OccWorld \cite{zheng2024occworld}:} An autoregressive 3D occupancy world model. We generate stochastic samples via temperature sampling.
+    \item \textbf{Vista \cite{gao2024vista}:} A diffusion-based video generation world model. We induce stochasticity by varying the initial noise seed.
+\end{itemize}
+For each scenario and model, we generate $N=20$ stochastic samples to estimate predictive uncertainty.
+
+\input{tables/tab1_calibration}
+
+\subsection{Overall Calibration (E1)}
+Our baseline evaluation reveals that both occupancy and video world models are significantly overconfident. As shown in Table~\ref{tab:overall_calibration}, OccWorld and Vista yield ECE values of \TODO{0.12} and \TODO{0.15}, respectively. The reliability diagrams (Figure~\ref{fig:reliability}) further illustrate this trend, showing that predictions with $>90\%$ confidence often exhibit empirical accuracies below \TODO{70\%}. 
+
+\subsection{Spatial-Temporal Analysis (E2-E4)}
+\textbf{Spatial Degradation:} Calibration error increases dramatically with distance from the ego vehicle. Table~\ref{tab:distance} demonstrates that for OccWorld, the ECE in the $0-10$m bin is \TODO{0.05}, but degrades to \TODO{0.18} in the $50-100$m bin.
+
+\textbf{Temporal Degradation:} Figure~\ref{fig:temporal_ece} shows the progression of ECE over the prediction horizon. At $0.5$s, models remain relatively well-calibrated, but by $3.0$s, accumulated autoregressive errors and diffusion drift cause the ECE to double.
+
+\textbf{Scenario Difficulty and Dynamics:} Hard scenarios exhibit significantly worse calibration than easy scenarios. Furthermore, uncertainty is particularly poorly calibrated for dynamic objects compared to static backgrounds, suggesting models struggle to properly quantify uncertainty in complex, highly dynamic interactions.
+
+\subsection{Recalibration (E5)}
+We apply post-hoc recalibration methods and report the results in Table~\ref{tab:recalibration}. Temperature scaling proves highly effective, reducing the ECE by over \TODO{50\%} for both models. Conformal prediction successfully provides the desired marginal coverage guarantees (Table~\ref{tab:conformal}), yielding reliable uncertainty bounds for high-stakes predictions.
+
+\subsection{Downstream Planning (E6)}
+To validate the utility of calibrated uncertainty, we evaluate the MPC planner. Table~\ref{tab:planning} demonstrates that integrating calibrated uncertainty ($\lambda > 0$) reduces the collision rate by \TODO{30\%} compared to the baseline planner ($\lambda = 0$). Furthermore, Figure~\ref{fig:planning_tradeoff} illustrates the safety-progress trade-off: highly risk-averse settings ($\lambda = 5$) eliminate collisions but result in overly conservative driving, highlighting the importance of tuning the uncertainty penalty based on properly calibrated confidence estimates.

@@ -1,7 +1,3 @@
 \begin{abstract}
-The ABSTRACT is to be in fully justified italicized text, at the top of the left-hand column, below the author and affiliation information.
-Use the word ``Abstract'' as the title, in 12-point Times, boldface type, centered relative to the column, initially capitalized.
-The abstract is to be in 10-point, single-spaced type.
-Leave two blank lines after the Abstract, then begin the main text.
-Look at previous \confName\ abstracts to get a feel for style and length.
+World models for autonomous driving are increasingly used for planning and simulation, yet their predictive uncertainty remains poorly understood. While these models can generate realistic future states, overconfident or poorly calibrated predictions can lead to catastrophic downstream planning failures. To address this gap, we introduce CalibraDrive, the first systematic benchmark for evaluating the calibration of driving world models. We evaluate representative architectures, including 3D occupancy (OccWorld) and video generation (Vista) models, across spatial dimensions, temporal horizons, and scenario difficulties on the nuScenes dataset. Our findings indicate that all tested models are significantly overconfident (\ece~> \TODO{0.05}), with calibration degrading further over longer prediction horizons and at greater distances from the ego vehicle. Furthermore, we demonstrate that simple post-hoc recalibration methods can reduce the \ece~by over \TODO{50\%}. Importantly, integrating calibrated uncertainty measurably improves downstream planning safety, highlighting the critical need for uncertainty-aware world modeling in autonomous driving.
 \end{abstract}

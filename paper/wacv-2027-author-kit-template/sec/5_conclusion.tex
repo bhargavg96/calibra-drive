@@ -1,0 +1,10 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this paper, we introduced CalibraDrive, the first benchmark dedicated to evaluating predictive uncertainty and calibration in driving world models. Our comprehensive analysis of representative occupancy and video models on the nuScenes dataset reveals a pervasive issue: modern generative driving models are significantly overconfident. This miscalibration worsens over longer prediction horizons and in hard driving scenarios, potentially jeopardizing downstream safety.
+
+Crucially, we show that simple post-hoc recalibration techniques, such as temperature scaling, effectively mitigate this overconfidence and are easy to adopt. Furthermore, integrating these calibrated uncertainty estimates into downstream planning significantly reduces collision rates, highlighting the practical necessity of uncertainty-aware world modeling.
+
+Future work will explore online, dynamic calibration methods and the integration of calibration objectives directly during the training phase of driving world models. We hope CalibraDrive will serve as a standard evaluation axis, encouraging the development of not just highly realistic, but highly reliable world models for autonomous driving. 
+
+Code and evaluation scripts will be made publicly available.

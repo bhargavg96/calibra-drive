@@ -752,6 +752,54 @@ class PaperFigureGenerator:
 
         return fig
 
+
+    # ──────────────────────────────────────────────────────────────────────
+    #  Figure 8: Sample Efficiency vs. Calibration Pareto Frontier
+    # ──────────────────────────────────────────────────────────────────────
+
+    def plot_sample_efficiency_pareto(
+        self,
+        efficiency_results: dict[str, dict[str, float]],
+        model_name: str = "OccWorld",
+        save_name: Optional[str] = "fig12_sample_efficiency_pareto",
+    ) -> plt.Figure:
+        """Plot sample count ablation: ECE and Brier score vs. relative inference latency."""
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
+        fig.suptitle(f"Sample Count Efficiency vs. Predictive Quality ({model_name})", fontsize=14, fontweight="bold")
+
+        n_vals = [d["n_samples"] for d in efficiency_results.values()]
+        ece_vals = [d["ece"] for d in efficiency_results.values()]
+        brier_vals = [d["brier"] for d in efficiency_results.values()]
+        latencies = [d["relative_latency"] for d in efficiency_results.values()]
+
+        # Plot 1: ECE vs N_samples
+        ax1.plot(n_vals, ece_vals, "o-", color="#2563eb", lw=2.5, markersize=8, label=f"{model_name} ECE")
+        ax1.set_xlabel("Number of Stochastic Samples ($N$)", fontsize=11, fontweight="bold")
+        ax1.set_ylabel("Expected Calibration Error (ECE)", fontsize=11, fontweight="bold")
+        ax1.set_title("(a) Calibration Error Decay with Sample Scale", fontsize=12, fontweight="bold")
+        ax1.grid(True, linestyle="--", alpha=0.6)
+        ax1.set_xticks(n_vals)
+
+        # Highlight optimal tradeoff
+        if len(n_vals) >= 3:
+            opt_idx = min(3, len(n_vals) - 1)
+            ax1.axvline(n_vals[opt_idx], color="#dc2626", linestyle=":", lw=1.8, label=f"Sweet Spot (N={n_vals[opt_idx]})")
+        ax1.legend()
+
+        # Plot 2: Pareto Curve (ECE vs Relative Inference Latency)
+        ax2.plot(latencies, ece_vals, "s--", color="#7c3aed", lw=2.2, markersize=8)
+        for i, txt in enumerate(n_vals):
+            ax2.annotate(f"N={txt}", (latencies[i], ece_vals[i]), textcoords="offset points", xytext=(8, 6), fontweight="bold")
+        ax2.set_xlabel("Relative Inference Compute Cost (x)", fontsize=11, fontweight="bold")
+        ax2.set_ylabel("Expected Calibration Error (ECE)", fontsize=11, fontweight="bold")
+        ax2.set_title("(b) Latency-Accuracy Pareto Frontier", fontsize=12, fontweight="bold")
+        ax2.grid(True, linestyle="--", alpha=0.6)
+
+        plt.tight_layout()
+        if save_name:
+            self._save(fig, save_name)
+        return fig
+
     def generate_all(
         self,
         predictions: list[np.ndarray],

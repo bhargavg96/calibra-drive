@@ -22,16 +22,19 @@
 | **Fig. 9** | `paper/figures/fig9_driving_anecdotes.pdf` | Step 8.5 | Qualitative case studies: 4 real-world driving anecdotes & failure modes |
 | **Fig. 10** | `paper/figures/fig10_camera_behavior_filmstrip.pdf` | Step 8.6 | Front-camera road picture sequence showing dynamic actor behavior & projected uncertainty |
 | **Fig. 11** | `paper/figures/fig11_road_camera_anecdotes.pdf` | Step 8.6 | Front-camera driver perspective driving anecdotes & calibration failure overlays |
+| **Fig. 12** | `paper/figures/fig12_sample_efficiency_pareto.pdf` | Step 4.5 | Pareto curve: Stochastic sample count ($N$) vs. ECE vs. inference compute latency |
 
 ### Table Mapping
 
 | Paper Table | File | Notebook Step | Description |
 |:---:|------|:---:|-------------|
-| **Tab. 1** | `paper/tables/tab1_calibration.tex` | Step 3 | ECE, MCE, Brier, AUROC per model |
-| **Tab. 2** | `paper/tables/tab2_spatial.tex` | Step 4 | ECE by distance bin and category |
-| **Tab. 3** | `paper/tables/tab3_recalibration.tex` | Step 5 | Before/after ECE + reduction % |
-| **Tab. 4** | `paper/tables/tab4_conformal.tex` | Step 5 | Conformal coverage: target vs empirical |
-| **Tab. 5** | `paper/tables/tab5_planning.tex` | Step 6 | Planning metrics across risk λ values |
+| **Tab. 1** | `paper/tables/tab1_calibration.tex` | Step 3 | Master benchmark: ECE, MCE, Brier, AUROC across models |
+| **Tab. 2** | `paper/tables/tab2_spatial.tex` | Step 4 | ECE stratified by distance bins ($0\text{--}100\text{m}$) and object categories |
+| **Tab. 3** | `paper/tables/tab3_recalibration.tex` | Step 5 | Recalibration ablation: Global vs. Spatio-Temporal $T(d,t)$ vs. Histogram Binning |
+| **Tab. 4** | `paper/tables/tab4_conformal.tex` | Step 5 | Conformal coverage: target vs empirical coverage at $\alpha \in \{0.05, 0.10, 0.20\}$ |
+| **Tab. 5** | `paper/tables/tab5_planning.tex` | Step 6 | Downstream planning safety, progress, and jerk comfort across risk $\lambda$ |
+| **Tab. 6** | `paper/tables/tab6_sample_ablation.tex` | Step 4.5 | Stochastic sample scale ablation ($N \in \{1, 3, 5, 10, 20\}$) vs. ECE |
+| **Tab. 7** | `paper/tables/tab7_domain_shift.tex` | Step 4.5 | Environmental stress test: Day/Clear vs. Night/Low-Light vs. Rain/Wet Asphalt |
 
 ### Results JSON
 

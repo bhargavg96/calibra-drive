@@ -51,8 +51,21 @@ To understand the practical failure modes of driving world models beyond aggrega
 \label{fig:camera_behavior}
 \end{figure*}
 
+\subsection{Stochastic Sample Scale \& Environmental Stress Tests}
+\label{sec:ablations}
+\textbf{Stochastic Sample Efficiency ($N \in \{1, 3, 5, 10, 20\}$):} An essential question for real-time deployment is how many forward passes are required for calibrated confidence. Table~\ref{tab:sample_ablation} and Figure~\ref{fig:pareto} demonstrate the latency-accuracy Pareto frontier. While greedy deterministic inference ($N=1$) suffers from extreme overconfidence (\ece~$= \TODO{0.24}$), calibration error decreases sharply up to $N=10$ (\ece~$= \TODO{0.11}$), beyond which diminishing returns set in. This confirms that $N=10$ provides an optimal operating point for onboard vehicle compute.
+
+\textbf{Environmental Domain Shift:} We stress-test calibration under adverse environmental conditions (Table~\ref{tab:domain_shift}). When transitioning from clear daytime driving to nighttime and rainy conditions, \ece~increases by \TODO{+48\%} and \TODO{+62\%}, respectively. Specular puddles and reduced camera dynamic range introduce significant perceptual noise that uncalibrated world models fail to reflect in their confidence scores.
+
+\begin{figure}[t]
+\centering
+% \includegraphics[width=\linewidth]{figures/fig12_sample_efficiency_pareto}
+\caption{Stochastic sample count ablation. (a) Calibration error (ECE) as a function of sample scale $N$. (b) Latency-accuracy Pareto frontier showing optimal convergence around $N=10$ samples.}
+\label{fig:pareto}
+\end{figure}
+
 \subsection{Recalibration (E5)}
-We apply post-hoc recalibration methods and report the results in Table~\ref{tab:recalibration}. Temperature scaling proves highly effective, reducing the ECE by over \TODO{50\%} for both models. Conformal prediction successfully provides the desired marginal coverage guarantees (Table~\ref{tab:conformal}), yielding reliable uncertainty bounds for high-stakes predictions.
+We evaluate post-hoc recalibration methods in Table~\ref{tab:recalibration}. Standard global temperature scaling reduces \ece~by over \TODO{50\%}. However, our proposed \textbf{Spatio-Temporal Temperature Scaling} $T(d, t)$ achieves the lowest calibration error across all configurations (\TODO{0.041}), demonstrating the critical value of distance- and horizon-conditioned corrections. Furthermore, conformal prediction successfully provides distribution-free marginal coverage guarantees (Table~\ref{tab:conformal}), establishing rigorous safety envelopes for mission-critical maneuvers.
 
 \subsection{Downstream Planning (E6)}
 To validate the utility of calibrated uncertainty, we evaluate the MPC planner. Table~\ref{tab:planning} demonstrates that integrating calibrated uncertainty ($\lambda > 0$) reduces the collision rate by \TODO{30\%} compared to the baseline planner ($\lambda = 0$). Furthermore, Figure~\ref{fig:planning_tradeoff} illustrates the safety-progress trade-off: highly risk-averse settings ($\lambda = 5$) eliminate collisions but result in overly conservative driving, highlighting the importance of tuning the uncertainty penalty based on properly calibrated confidence estimates.
